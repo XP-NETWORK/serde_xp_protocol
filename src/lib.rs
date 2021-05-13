@@ -3,7 +3,6 @@ mod error;
 mod ser;
 
 pub use de::{from_bytes};
-pub use error::{Result};
 pub use ser::{to_bytes};
 
 #[cfg(test)]

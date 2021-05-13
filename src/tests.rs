@@ -1,7 +1,7 @@
 use crate::*;
 
 #[test]
-fn test_serialize() {
+fn test_ser() {
     let test_data = "{\"name\": \"test\"}";
     println!("test data: {}\n", test_data);
 
@@ -13,3 +13,11 @@ fn test_serialize() {
     println!("Bytes: {}", hex::encode(to_bytes(&prot, serde_json::to_vec).unwrap()));
 }
 
+#[test]
+fn test_de() {
+    let test_bytes = hex::decode("000000000000000f7b226e616d65223a2274657374227d").unwrap();
+    let prot: XpProtocol<serde_json::Value> = from_bytes(&test_bytes, serde_json::from_slice).unwrap();
+    assert_eq!(prot.topic_id, 0);
+
+    println!("Decoded: {:?}\n", prot);
+}
