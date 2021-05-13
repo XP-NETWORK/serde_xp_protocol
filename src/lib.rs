@@ -1,5 +1,5 @@
 mod de;
-mod error;
+mod error; // TODO
 mod ser;
 
 pub use de::{from_bytes};
@@ -9,7 +9,6 @@ pub use ser::{to_bytes};
 mod tests;
 
 use bitfield::bitfield;
-use serde::{de::DeserializeOwned, Serialize};
 use std::fmt;
 
 bitfield! {
@@ -25,43 +24,31 @@ bitfield! {
     pub ser, _: 6;
     reserved, _: 7, 15;
 }
-pub struct XpProtocol<T: DeserializeOwned + Serialize> {
+pub struct XpProtocol<'a> {
     pub topic_id: u16,
     pub flags: Flags,
-    length: Option<u32>,
-    pub data: T,
+    length: u32,
+    pub data: &'a [u8],
 }
 
-impl<T: DeserializeOwned + Serialize> XpProtocol<T> {
-    pub fn new<'a, E>(topic_id: u16, flags: Flags, data: &'a [u8], de: fn(&'a [u8]) -> Result<T, E>) -> Result<Self, E>
-        where
-            E: serde::de::Error + serde::ser::Error
-    {
-        Ok(Self {
-            topic_id,
-            flags,
-            length: Some(data.len() as u32),
-            data: de(data)?,
-        })
-    }
-
-    pub fn new_typed(topic_id: u16, flags: Flags, data: T) -> Self {
+impl<'a> XpProtocol<'a> {
+    pub fn new(topic_id: u16, flags: Flags, data: &'a [u8]) -> Self {
         Self {
             topic_id,
             flags,
-            length: None,
-            data
+            length: data.len() as u32,
+            data: data,
         }
     }
 }
 
-impl<T: DeserializeOwned + Serialize + fmt::Debug> fmt::Debug for XpProtocol<T> {
+impl fmt::Debug for XpProtocol<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("XpProtocol")
           .field("topic_id", &self.topic_id)
           .field("flags", &self.flags.0)
           .field("length", &self.length)
-          .field("data", &self.data)
+          .field("data", &"...".to_string())
           .finish()
     }
 }
