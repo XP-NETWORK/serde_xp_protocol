@@ -7,7 +7,7 @@ fn test_ser() {
 
     let data: serde_json::Value = serde_json::from_str(test_data).unwrap();
 
-    let prot = XpProtocol::new_typed(0, Flags(&[0u8, 0]), data);
+    let prot = XpProtocol::new_typed(0, Flags(0), data);
 
     println!("Protocol Data: {:?}\n", prot);
     println!("Bytes: {}", hex::encode(to_bytes(&prot, serde_json::to_vec).unwrap()));

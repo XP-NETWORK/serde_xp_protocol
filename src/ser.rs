@@ -1,9 +1,9 @@
 use crate::{
     XpProtocol,
 };
-use serde::{Serialize, Deserialize, ser, de};
+use serde::{Serialize, de::DeserializeOwned, ser, de};
 
-pub fn to_bytes<'a, T: Serialize + Deserialize<'a>, E>(v: &XpProtocol<'a, T>, serializer: fn(&T) -> Result<Vec<u8>, E>) -> Result<Vec<u8>, E>
+pub fn to_bytes<T: Serialize + DeserializeOwned, E>(v: &XpProtocol<T>, serializer: fn(&T) -> Result<Vec<u8>, E>) -> Result<Vec<u8>, E>
 where
     E: ser::Error + de::Error
 {
@@ -12,7 +12,7 @@ where
 
     let mut res = Vec::new();
     res.extend(&v.topic_id.to_be_bytes());
-    res.extend(v.flags.0);
+    res.extend(&v.flags.0.to_be_bytes());
     res.extend(&l.to_be_bytes());
     res.extend(data);
     Ok(res)

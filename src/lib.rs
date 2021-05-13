@@ -9,11 +9,11 @@ pub use ser::{to_bytes};
 mod tests;
 
 use bitfield::bitfield;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Serialize};
 use std::fmt;
 
 bitfield! {
-    pub struct Flags(MSB0 [u8]);
+    pub struct Flags(u16);
     impl Debug;
     u16;
     pub ack, _: 0;
@@ -25,15 +25,15 @@ bitfield! {
     pub ser, _: 6;
     reserved, _: 7, 15;
 }
-pub struct XpProtocol<'a, T: Deserialize<'a> + Serialize> {
+pub struct XpProtocol<T: DeserializeOwned + Serialize> {
     pub topic_id: u16,
-    pub flags: Flags<&'a [u8]>,
+    pub flags: Flags,
     length: Option<u32>,
     pub data: T,
 }
 
-impl<'a, T: Deserialize<'a> + Serialize> XpProtocol<'a, T> {
-    pub fn new<E>(topic_id: u16, flags: Flags<&'a [u8]>, data: &'a [u8], de: fn(&'a [u8]) -> Result<T, E>) -> Result<Self, E>
+impl<T: DeserializeOwned + Serialize> XpProtocol<T> {
+    pub fn new<'a, E>(topic_id: u16, flags: Flags, data: &'a [u8], de: fn(&'a [u8]) -> Result<T, E>) -> Result<Self, E>
         where
             E: serde::de::Error + serde::ser::Error
     {
@@ -45,7 +45,7 @@ impl<'a, T: Deserialize<'a> + Serialize> XpProtocol<'a, T> {
         })
     }
 
-    pub fn new_typed(topic_id: u16, flags: Flags<&'a [u8]>, data: T) -> Self {
+    pub fn new_typed(topic_id: u16, flags: Flags, data: T) -> Self {
         Self {
             topic_id,
             flags,
@@ -55,7 +55,7 @@ impl<'a, T: Deserialize<'a> + Serialize> XpProtocol<'a, T> {
     }
 }
 
-impl<'a, T: Deserialize<'a> + Serialize + fmt::Debug> fmt::Debug for XpProtocol<'a, T> {
+impl<T: DeserializeOwned + Serialize + fmt::Debug> fmt::Debug for XpProtocol<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("XpProtocol")
           .field("topic_id", &self.topic_id)
