@@ -1,13 +1,10 @@
 use crate::{
     XpProtocol,
 };
+use bincode::{Options, DefaultOptions, Result};
 
-pub fn to_bytes<'a>(v: &XpProtocol<'a>) -> Vec<u8> {
-    let mut res = Vec::new();
-    res.extend(&v.topic_id.to_be_bytes());
-    res.extend(&v.flags.0.to_be_bytes());
-    res.extend(&v.length.to_be_bytes());
-    res.extend(v.data);
-
-    res
+pub fn to_bytes<'a>(v: &XpProtocol<'a>) -> Result<Vec<u8>> {
+    DefaultOptions::new()
+        .with_big_endian()
+        .serialize(v)
 }
