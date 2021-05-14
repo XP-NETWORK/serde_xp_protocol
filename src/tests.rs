@@ -3,14 +3,17 @@ use crate::*;
 #[test]
 fn test_flags() {
     // reserved_, ser, der, ner, end, rej, ok, ack (LE system)
-    let flags = Flags(0b0000000001101101);
+    let flags = Flags(0b0000001011101101);
     assert_eq!(flags.ack(), true);
     assert_eq!(flags.ok(), false);
     assert_eq!(flags.rej(), true);
     assert_eq!(flags.end(), true);
     assert_eq!(flags.ner(), false);
     assert_eq!(flags.der(), true);
-    assert_eq!(flags.ser(), true);
+    assert_eq!(flags.col(), true);
+    assert_eq!(flags.snt(), true);
+    assert_eq!(flags.exe(), false);
+    assert_eq!(flags.inf(), true);
     assert_eq!(std::mem::size_of::<Flags>(), 2);
 }
 

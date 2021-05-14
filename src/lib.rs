@@ -26,8 +26,11 @@ bitfield! {
     pub end, set_end: 3;
     pub ner, set_ner: 4;
     pub der, set_der: 5;
-    pub ser, set_ser: 6;
-    reserved, _: 7, 15;
+    pub col, set_col: 6;
+    pub snt, set_snt: 7;
+    pub exe, set_exe: 8;
+    pub inf, set_inf: 9;
+    reserved, _: 9, 15;
 }
 
 impl fmt::Debug for Flags {
@@ -39,7 +42,10 @@ impl fmt::Debug for Flags {
           .field("end", &self.end())
           .field("ner", &self.ner())
           .field("der", &self.der())
-          .field("ser", &self.ser())
+          .field("col", &self.col())
+          .field("snt", &self.snt())
+          .field("exe", &self.exe())
+          .field("inf", &self.inf())
           .finish()
     }
 }
